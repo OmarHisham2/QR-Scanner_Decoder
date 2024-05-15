@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def detect_and_remove_periodic_noise(image_path):
+def detect_and_remove_periodic_noise(image):
     # Load the image in grayscale
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    
 
     # Get the image dimensions
     rows, cols = image.shape
@@ -60,21 +60,29 @@ def detect_and_remove_periodic_noise(image_path):
     plt.title('Processed Image'), plt.xticks([]), plt.yticks([])
     plt.show()
 
-    return True, img_back
+    return True
 
-import os
-from google.colab import drive
-drive.mount('/content/drive')
+
+
+img = cv2.imread('TC/11.png')
+img = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+print(detect_and_remove_periodic_noise(img))
+
+#
+#import os
+#from google.colab import drive
+#drive.mount('/content/drive')
 
 # Step 2: Define the path to the shortcut folder
-folder_path = '/content/drive/My Drive/CSE483 Sp24 Project Test Cases'
+#folder_path = '/content/drive/My Drive/CSE483 Sp24 Project Test Cases'
 
 # Step 5: Process each image in the folder
-for filename in os.listdir(folder_path):
-    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
-        image_path = os.path.join(folder_path, filename)
-        print(f'Processing {image_path}')
-        processed_image = detect_and_remove_periodic_noise(image_path)
+#for filename in os.listdir(folder_path):
+ #   if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
+  #      image_path = os.path.join(folder_path, filename)
+   #     print(f'Processing {image_path}')
+       # processed_image = detect_and_remove_periodic_noise(image_path)
         # # Save the processed image if needed
         # output_path = os.path.join(folder_path, 'processed_' + filename)
         # cv2.imwrite(output_path, processed_image)
