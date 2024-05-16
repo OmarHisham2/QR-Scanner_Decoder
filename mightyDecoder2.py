@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import reedsolo as rs
-import utils as ut
+import customUtils as ut
 from enum import Enum
 
 class Encoding(Enum):
