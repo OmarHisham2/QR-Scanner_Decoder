@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import customUtils as ut
 from colorama import Fore, Back, Style # Nice Colors
 
 def loadImageT(imgPath):
@@ -321,6 +322,76 @@ def detectPeriodicNoise(image):
       return False
     return True
 
+
+def detect_histogram_equalization(image, threshold=0.90):
+
+    rows, cols = image.shape
+
+    black_pixels = np.sum(image < 3)
+    white_pixels = np.sum(image > 253)
+
+    total_pixels = rows * cols
+    black_ratio = black_pixels / total_pixels
+    white_ratio = white_pixels / total_pixels
+
+    #print(f'Black pixels: {black_pixels}, White pixels: {white_pixels}')
+    #print(f'Black ratio: {black_ratio:.4f}, White ratio: {white_ratio:.4f}')
+
+    if black_ratio > threshold or white_ratio > threshold:
+       # print("Noise detected")
+        return True
+    else:
+        # print("No significant salt-and-pepper noise detected")
+        return False
+    
+
+def detect_salt_and_pepper_noise(image, salt_threshold=0.005, pepper_threshold=0.005):
+
+
+    rows, cols = image.shape
+
+
+    salt_noise = ((image == 255) & (cv2.medianBlur(image, 3) == 0)).astype(int)
+    num_salt_noise = np.sum(salt_noise)
+
+
+    pepper_noise = ((image == 0) & (cv2.medianBlur(image, 3) == 255)).astype(int)
+    num_pepper_noise = np.sum(pepper_noise)
+
+
+    total_pixels = rows * cols
+    salt_noise_ratio = num_salt_noise / total_pixels
+    pepper_noise_ratio = num_pepper_noise / total_pixels
+
+    #print(f"Salt noise ratio: {salt_noise_ratio:.4f}")
+    #print(f"Pepper noise ratio: {pepper_noise_ratio:.4f}")
+
+
+    #plt.figure(figsize=(15, 5))
+    #plt.subplot(131), plt.imshow(image, cmap='gray')
+    ##plt.title('Input Image'), plt.xticks([]), plt.yticks([])
+    #plt.subplot(132), plt.imshow(salt_noise, cmap='gray')
+    #plt.title('Salt Noise'), plt.xticks([]), plt.yticks([])
+    #plt.subplot(133), plt.imshow(pepper_noise, cmap='gray')
+    #plt.title('Pepper Noise'), plt.xticks([]), plt.yticks([])
+    #plt.show()
+
+
+    salt_detected = salt_noise_ratio > salt_threshold
+    pepper_detected = pepper_noise_ratio > pepper_threshold
+
+    if salt_detected and pepper_detected:
+        print("Salt and pepper noise detected")
+        return True
+    elif salt_detected:
+        print("Salt noise detected")
+        return True
+    elif pepper_detected:
+        print("Pepper noise detected")
+        return True
+    else:
+        return False
+
 ## CHECKING FUNCTIONS -- END ##
 
 
@@ -452,7 +523,6 @@ def AdjustPrespective(image):
 
 def fixPeriodicNoise(img):
     
-    
 
     # Get the image dimensions
     rows, cols = img.shape
@@ -499,5 +569,27 @@ def fixPeriodicNoise(img):
     img_back = np.uint8(img_back)
 
     return img_back
+
+
+
+def fixHistogramEqualization(image,kernel):
+    
+    equalized_image = cv2.equalizeHist(image)
+
+    ret, binary_img = cv2.threshold(equalized_image, 128, 255, cv2.THRESH_BINARY)
+
+    eroded_img = cv2.erode(binary_img, kernel, iterations=11)
+
+    dilated_img = cv2.dilate(eroded_img, kernel, iterations=10)
+
+    return dilated_img
+
+
+def fixSaltAndPepper(img):
+    
+    average_img = cv2.blur(img, (21, 21))  # Larger average kernel
+    final_filtered_img = cv2.medianBlur(average_img, 31)  # Larger median kernel
+    ret,thresh1 = cv2.threshold(final_filtered_img,120,255,cv2.THRESH_BINARY)
+    return thresh1
 
 ## FIXING FUNCTIONS -- END  

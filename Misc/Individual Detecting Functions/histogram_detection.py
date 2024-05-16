@@ -29,23 +29,9 @@ def detect_histogram_equalization(image_path, threshold=0.90):
         print("Noise detected")
         return True
     else:
-        # print("No significant salt-and-pepper noise detected")
+        print("No significant salt-and-pepper noise detected")
         return False
 
-image_path = '13.png'
+image_path = 'TC/13.png'
 detect_histogram_equalization(image_path)
 
-import os
-from google.colab import drive
-drive.mount('/content/drive')
-
-folder_path = '/content/drive/My Drive/CSE483 Sp24 Project Test Cases'
-
-for filename in os.listdir(folder_path):
-    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
-        image_path = os.path.join(folder_path, filename)
-        # print(f'Processing {image_path}')
-        processed_image = detect_histogram_equalization(image_path)
-        # output_path = os.path.join(folder_path, 'processed_' + filename)
-        # cv2.imwrite(output_path, processed_image)
-        # print(f'Saved processed image to {output_path}')
